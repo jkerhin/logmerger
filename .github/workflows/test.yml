@@ -1,0 +1,7 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  call-reusable-test:
+    uses: ./.github/workflows/reusable-test.yml
