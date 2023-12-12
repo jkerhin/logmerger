@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 import string
 from datetime import datetime
 from functools import partial
@@ -8,6 +9,10 @@ from pathlib import Path
 import re
 from typing import Callable, TypeVar, Union
 
+if sys.version_info.minor < 11:
+    from dateutil.parser import isoparse as fromisoformat
+else:
+    fromisoformat = datetime.fromisoformat
 
 T = TypeVar("T")
 TimestampFormatter = Union[Union[str, Callable[[str], datetime]]]
@@ -161,7 +166,7 @@ class YMDHMScommaFTZ(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DD HH:MM:SS,SSS<timezone>"
     timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}(?:Z|[+-]\d{2}:?\d{2})"
     pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = datetime.fromisoformat
+    strptime_format = fromisoformat
     has_timezone = True
 
     def __init__(self):
@@ -172,7 +177,7 @@ class YMDHMScommaF(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DD HH:MM:SS,SSS"
     timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}"
     pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = datetime.fromisoformat
+    strptime_format = fromisoformat
 
     def __init__(self):
         super().__init__(self.pattern, self.strptime_format)
@@ -182,7 +187,7 @@ class YMDHMSdotFZ(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DD HH:MM:SS.SSS"
     timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}(?:Z|[+-]\d{2}:?\d{2})"
     pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = datetime.fromisoformat
+    strptime_format = fromisoformat
     has_timezone = True
 
     def __init__(self):
@@ -193,7 +198,7 @@ class YMDHMSdotF(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DD HH:MM:SS.SSS"
     timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}"
     pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = datetime.fromisoformat
+    strptime_format = fromisoformat
 
     def __init__(self):
         super().__init__(self.pattern, self.strptime_format)
@@ -203,7 +208,7 @@ class YMDHMSZ(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DD HH:MM:SS"
     timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:?\d{2})"
     pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = datetime.fromisoformat
+    strptime_format = fromisoformat
     has_timezone = True
 
     def __init__(self):
@@ -214,7 +219,7 @@ class YMDHMS(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DD HH:MM:SS"
     timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
     pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = datetime.fromisoformat
+    strptime_format = fromisoformat
 
     def __init__(self):
         super().__init__(self.pattern, self.strptime_format)
@@ -224,7 +229,7 @@ class YMDTHMScommaFZ(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DDTHH:MM:SS,SSS"
     timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2},\d{3}(?:Z|[+-]\d{2}:?\d{2})"
     pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = datetime.fromisoformat
+    strptime_format = fromisoformat
     has_timezone = True
 
     def __init__(self):
@@ -235,7 +240,7 @@ class YMDTHMScommaF(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DDTHH:MM:SS,SSS"
     timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2},\d{3}"
     pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = datetime.fromisoformat
+    strptime_format = fromisoformat
 
     def __init__(self):
         super().__init__(self.pattern, self.strptime_format)
@@ -245,7 +250,7 @@ class YMDTHMSdotFZ(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DDTHH:MM:SS.SSS"
     timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}(?:Z|[+-]\d{2}:?\d{2})"
     pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = datetime.fromisoformat
+    strptime_format = fromisoformat
     has_timezone = True
 
     def __init__(self):
@@ -256,7 +261,7 @@ class YMDTHMSdotF(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DDTHH:MM:SS.SSS"
     timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}"
     pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = datetime.fromisoformat
+    strptime_format = fromisoformat
 
     def __init__(self):
         super().__init__(self.pattern, self.strptime_format)
@@ -266,7 +271,7 @@ class YMDTHMSZ(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DDTHH:MM:SS"
     timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:?\d{2})"
     pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = datetime.fromisoformat
+    strptime_format = fromisoformat
     has_timezone = True
 
     def __init__(self):
@@ -277,7 +282,7 @@ class YMDTHMS(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DDTHH:MM:SS"
     timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"
     pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = datetime.fromisoformat
+    strptime_format = fromisoformat
 
     def __init__(self):
         super().__init__(self.pattern, self.strptime_format)
