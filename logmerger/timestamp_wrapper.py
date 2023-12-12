@@ -159,7 +159,7 @@ class TimestampedLineTransformer:
 
 class YMDHMScommaFTZ(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DD HH:MM:SS,SSS<timezone>"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}\s?(?:Z|[+-]\d{4})"
+    timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}(?:Z|[+-]\d{2}:?\d{2})"
     pattern = fr"(({timestamp_pattern})\s)"
     strptime_format = datetime.fromisoformat
     has_timezone = True
@@ -180,7 +180,7 @@ class YMDHMScommaF(TimestampedLineTransformer):
 
 class YMDHMSdotFZ(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DD HH:MM:SS.SSS"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}\s?(?:Z|[+-]\d{4})"
+    timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}(?:Z|[+-]\d{2}:?\d{2})"
     pattern = fr"(({timestamp_pattern})\s)"
     strptime_format = datetime.fromisoformat
     has_timezone = True
@@ -201,7 +201,7 @@ class YMDHMSdotF(TimestampedLineTransformer):
 
 class YMDHMSZ(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DD HH:MM:SS"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\s?(?:Z|[+-]\d{4})"
+    timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:?\d{2})"
     pattern = fr"(({timestamp_pattern})\s)"
     strptime_format = datetime.fromisoformat
     has_timezone = True
@@ -222,7 +222,7 @@ class YMDHMS(TimestampedLineTransformer):
 
 class YMDTHMScommaFZ(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DDTHH:MM:SS,SSS"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2},\d{3}\s?(?:Z|[+-]\d{4})"
+    timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2},\d{3}(?:Z|[+-]\d{2}:?\d{2})"
     pattern = fr"(({timestamp_pattern})\s)"
     strptime_format = datetime.fromisoformat
     has_timezone = True
@@ -243,7 +243,7 @@ class YMDTHMScommaF(TimestampedLineTransformer):
 
 class YMDTHMSdotFZ(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DDTHH:MM:SS.SSS"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}\s?(?:Z|[+-]\d{4}Z?)"
+    timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}(?:Z|[+-]\d{2}:?\d{2})"
     pattern = fr"(({timestamp_pattern})\s)"
     strptime_format = datetime.fromisoformat
     has_timezone = True
@@ -264,7 +264,7 @@ class YMDTHMSdotF(TimestampedLineTransformer):
 
 class YMDTHMSZ(TimestampedLineTransformer):
     # log files with timestamp "YYYY-MM-DDTHH:MM:SS"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\s?(?:Z|[+-]\d{4})"
+    timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:?\d{2})"
     pattern = fr"(({timestamp_pattern})\s)"
     strptime_format = datetime.fromisoformat
     has_timezone = True
