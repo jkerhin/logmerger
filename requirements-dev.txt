@@ -2,5 +2,7 @@
 littletable
 rich
 textual
+python-dateutil ; python_version < "3.11"
 pyshark
 pytest
+freezegun

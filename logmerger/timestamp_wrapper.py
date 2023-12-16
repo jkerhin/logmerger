@@ -157,7 +157,7 @@ class TimestampedLineTransformer:
         # remove escape sequences, which throw off the tabularization of output
         # (consider replacing with rich tags)
         if self.has_timezone and ret[0] is not None:
-            return ret[0].astimezone().replace(tzinfo=None), strip_escape_sequences(ret[1]).rstrip()
+            return ret[0].replace(tzinfo=None), strip_escape_sequences(ret[1]).rstrip()
         else:
             return ret[0], strip_escape_sequences(ret[1]).rstrip()
 
@@ -335,7 +335,7 @@ class HttpServerAccessLog(TimestampedLineTransformer):
     def __init__(self):
         super().__init__(
             self.pattern,
-            lambda s: datetime.strptime(s, self.strptime_format).astimezone().replace(tzinfo=None)
+            lambda s: datetime.strptime(s, self.strptime_format).replace(tzinfo=None)
         )
 
 
