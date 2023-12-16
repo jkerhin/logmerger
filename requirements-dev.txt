@@ -1,0 +1,6 @@
+-e .
+littletable
+rich
+textual
+pyshark
+pytest
