@@ -85,6 +85,14 @@ def test_transformer_timestamp(line_in, expected):
             "2023-07-14T14:13:00.100+00:00 message",
             EXPECTED_DATETIME,
         ),
+        (
+            "2023-07-14T14:13:00.100+0000 message",
+            EXPECTED_DATETIME,
+        ),
+        (
+            "2023-07-14T14:13:00.100+00 message",
+            EXPECTED_DATETIME,
+        ),
         ("2023-07-14 14:13:00Z message", EXPECTED_DATETIME.replace(microsecond=0)),
         ("2023-07-14 14:13:00+00:00 message", EXPECTED_DATETIME.replace(microsecond=0)),
         ("2023-07-14 14:13:00+0000 message", EXPECTED_DATETIME.replace(microsecond=0)),

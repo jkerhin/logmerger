@@ -37,7 +37,7 @@ class TimestampedLineTransformer:
     custom_transformer_suffixes = iter(string.ascii_uppercase)
 
     def __init_subclass__(cls):
-        cls.match = re.compile(cls.pattern).match
+        cls.match = re.compile(cls.pattern, re.VERBOSE).match
 
     @staticmethod
     def _get_first_line_of_file(file_ref) -> str:
@@ -126,8 +126,8 @@ class TimestampedLineTransformer:
             )
 
     def __init__(self, pattern: str, strptime_formatter: TimestampFormatter):
-        self._re_pattern_match = re.compile(pattern).match
-        self._re_pattern_sub = partial(re.compile(pattern).sub, count=1)
+        self._re_pattern_match = re.compile(pattern, re.VERBOSE).match
+        self._re_pattern_sub = partial(re.compile(pattern, re.VERBOSE).sub, count=1)
         self.pattern: str = pattern
 
         if isinstance(strptime_formatter, str):
@@ -162,127 +162,34 @@ class TimestampedLineTransformer:
             return ret[0], strip_escape_sequences(ret[1]).rstrip()
 
 
-class YMDHMScommaFTZ(TimestampedLineTransformer):
-    # log files with timestamp "YYYY-MM-DD HH:MM:SS,SSS<timezone>"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}(?:Z|[+-]\d{2}:?\d{2})"
-    pattern = fr"(({timestamp_pattern})\s)"
+class ISOFormat(TimestampedLineTransformer):
+    """Valid ISO-8601 formatted timestamps
+
+    Note that because all timestamps are being cast to naive datetimes, we can force
+    'has_timezone' to true with no detrimental effects
+
+    Note also that this regex will not reject invalid datetimes - it will match on invalid
+    dates/times like "2023-23-99 55:99:88"
+    """
+    pattern = r"""(  # Begin timestamp + message group
+        (      # Begin timestamp capture group
+        \d{4}  # Year
+        -?     # Optional separator
+        \d{2}  # Month
+        -?     # Optional separator
+        \d{2}  # Day
+        [T\s]? # Optional separator
+        \d{2}  # Hour
+        :?     # Optional separator
+        \d{2}  # Minute
+        :?     # Optional separator
+        \d{2}  # Second
+        (?:[,.]\d+)?  # Optionally, include sub-second precision and separator
+        (?:Z|[+-]\d{2}:?(?:\d{2})?)?  # Optionally, timezone offset
+        )      # End timestamp capture group
+    \s) # End timestamp + message group"""
     strptime_format = fromisoformat
     has_timezone = True
-
-    def __init__(self):
-        super().__init__(self.pattern, self.strptime_format)
-
-
-class YMDHMScommaF(TimestampedLineTransformer):
-    # log files with timestamp "YYYY-MM-DD HH:MM:SS,SSS"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}"
-    pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = fromisoformat
-
-    def __init__(self):
-        super().__init__(self.pattern, self.strptime_format)
-
-
-class YMDHMSdotFZ(TimestampedLineTransformer):
-    # log files with timestamp "YYYY-MM-DD HH:MM:SS.SSS"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}(?:Z|[+-]\d{2}:?\d{2})"
-    pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = fromisoformat
-    has_timezone = True
-
-    def __init__(self):
-        super().__init__(self.pattern, self.strptime_format)
-
-
-class YMDHMSdotF(TimestampedLineTransformer):
-    # log files with timestamp "YYYY-MM-DD HH:MM:SS.SSS"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}"
-    pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = fromisoformat
-
-    def __init__(self):
-        super().__init__(self.pattern, self.strptime_format)
-
-
-class YMDHMSZ(TimestampedLineTransformer):
-    # log files with timestamp "YYYY-MM-DD HH:MM:SS"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:?\d{2})"
-    pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = fromisoformat
-    has_timezone = True
-
-    def __init__(self):
-        super().__init__(self.pattern, self.strptime_format)
-
-
-class YMDHMS(TimestampedLineTransformer):
-    # log files with timestamp "YYYY-MM-DD HH:MM:SS"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
-    pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = fromisoformat
-
-    def __init__(self):
-        super().__init__(self.pattern, self.strptime_format)
-
-
-class YMDTHMScommaFZ(TimestampedLineTransformer):
-    # log files with timestamp "YYYY-MM-DDTHH:MM:SS,SSS"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2},\d{3}(?:Z|[+-]\d{2}:?\d{2})"
-    pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = fromisoformat
-    has_timezone = True
-
-    def __init__(self):
-        super().__init__(self.pattern, self.strptime_format)
-
-
-class YMDTHMScommaF(TimestampedLineTransformer):
-    # log files with timestamp "YYYY-MM-DDTHH:MM:SS,SSS"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2},\d{3}"
-    pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = fromisoformat
-
-    def __init__(self):
-        super().__init__(self.pattern, self.strptime_format)
-
-
-class YMDTHMSdotFZ(TimestampedLineTransformer):
-    # log files with timestamp "YYYY-MM-DDTHH:MM:SS.SSS"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}(?:Z|[+-]\d{2}:?\d{2})"
-    pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = fromisoformat
-    has_timezone = True
-
-    def __init__(self):
-        super().__init__(self.pattern, self.strptime_format)
-
-
-class YMDTHMSdotF(TimestampedLineTransformer):
-    # log files with timestamp "YYYY-MM-DDTHH:MM:SS.SSS"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}"
-    pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = fromisoformat
-
-    def __init__(self):
-        super().__init__(self.pattern, self.strptime_format)
-
-
-class YMDTHMSZ(TimestampedLineTransformer):
-    # log files with timestamp "YYYY-MM-DDTHH:MM:SS"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:?\d{2})"
-    pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = fromisoformat
-    has_timezone = True
-
-    def __init__(self):
-        super().__init__(self.pattern, self.strptime_format)
-
-
-class YMDTHMS(TimestampedLineTransformer):
-    # log files with timestamp "YYYY-MM-DDTHH:MM:SS"
-    timestamp_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"
-    pattern = fr"(({timestamp_pattern})\s)"
-    strptime_format = fromisoformat
 
     def __init__(self):
         super().__init__(self.pattern, self.strptime_format)
@@ -291,7 +198,7 @@ class YMDTHMS(TimestampedLineTransformer):
 class BDHMS(TimestampedLineTransformer):
     # syslog files with timestamp "mon day hh:mm:ss"
     # (note, year is omitted so let's guess from the log file's create date)
-    timestamp_pattern = r"[JFMASOND][a-z]{2}\s(\s|\d)\d \d{2}:\d{2}:\d{2}"
+    timestamp_pattern = r"[JFMASOND][a-z]{2}\s(\s|\d)\d\s\d{2}:\d{2}:\d{2}"
     pattern = fr"(({timestamp_pattern})\s)"
     strptime_format = "%b %d %H:%M:%S"
 
@@ -313,8 +220,8 @@ class BDHMS(TimestampedLineTransformer):
 
 class PythonHttpServerLog(TimestampedLineTransformer):
     # ::1 - - [22/Sep/2023 21:58:40] "GET /log1.txt HTTP/1.1" 200 -
-    timestamp_pattern = r"\d{2}\/\w+\/\d{4} \d{2}:\d{2}:\d{2}"
-    pattern = fr"(.*)(- \[({timestamp_pattern})\]\s)"
+    timestamp_pattern = r"\d{2}\/\w+\/\d{4}\s\d{2}:\d{2}:\d{2}"
+    pattern = fr"(.*)(-\s\[({timestamp_pattern})\]\s)"
     strptime_format = "%d/%b/%Y %H:%M:%S"
     timestamp_match_group = 3
     sub_repl = r"\1"
@@ -326,8 +233,8 @@ class PythonHttpServerLog(TimestampedLineTransformer):
 class HttpServerAccessLog(TimestampedLineTransformer):
     # 91.194.60.14 - - [16/Sep/2023:19:05:06 +0000] "GET /python_nutshell_app_a_search HTTP/1.1" 200 1027 "-"
     #   "http.rb/5.1.1 (Mastodon/4.1.3; +https://mamot.fr/) Bot" "91.194.60.14" response-time=0.002
-    timestamp_pattern = r"\d{2}\/\w+\/\d{4}:\d{2}:\d{2}:\d{2} [+-]\d{4}"
-    pattern = fr"(.*)(- \[({timestamp_pattern})\]\s)"
+    timestamp_pattern = r"\d{2}\/\w+\/\d{4}:\d{2}:\d{2}:\d{2}\s[+-]\d{4}"
+    pattern = fr"(.*)(-\s\[({timestamp_pattern})\]\s)"
     strptime_format = "%d/%b/%Y:%H:%M:%S %z"
     timestamp_match_group = 3
     sub_repl = r"\1"
